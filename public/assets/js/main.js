@@ -1,4 +1,5 @@
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxN71K8WFzySZTvBidkhLRvIlkWhakzG3lC5nt1FAXuYVV_lsBaNM2R-NH9OPY9vVEEGA/exec';
+const DEPLOYMENT_ID = "AKfycbzrF-vwmovqv0taB9Si3A7UUlY5B9-QyipKsKQLrCLOt8G51AD6iKeWCQvCV9cwRmI9JA";
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrF-vwmovqv0taB9Si3A7UUlY5B9-QyipKsKQLrCLOt8G51AD6iKeWCQvCV9cwRmI9JA/exec';
 
 let activeFileId = null;
 
@@ -24,6 +25,7 @@ function openModal(id) {
   ['firstName', 'lastName', 'company', 'email'].forEach(name =>
     form.elements[name].classList.remove('is-invalid')
   );
+  form.elements.consent.checked = true;
   if (!bsModal) bsModal = new bootstrap.Modal(document.getElementById('downloadModal'));
   bsModal.show();
 }
@@ -106,6 +108,7 @@ form.addEventListener('submit', async (e) => {
     lastName:  form.elements.lastName.value,
     company:   form.elements.company.value,
     email:     form.elements.email.value,
+    consent:   form.elements.consent.checked,
   };
 
   if (!validateForm(data)) return;
