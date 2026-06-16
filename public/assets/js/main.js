@@ -13,10 +13,12 @@ const alertArea  = document.getElementById('alert-area');
 const downloadBodyTitle = document.getElementById('downloadModalBodyTitle');
 let bsModal = null;
 
-function openModal(index) {
-  const wp = WHITEPAPERS[index];
-  activeFileId = wp.fileId;
-  downloadBodyTitle.textContent = wp.title;
+function openModal(id) {
+  const wp = WHITEPAPERS.find(w => w.id === id);
+  const locale = wp.locales[currentLang] ?? wp.locales.en;
+  activeFileId = locale.fileId;
+  downloadBodyTitle.setAttribute('data-i18n', 'whitepapers.' + id + '.title');
+  applyTranslations();
   alertArea.innerHTML = '';
   form.reset();
   ['firstName', 'lastName', 'company', 'email'].forEach(name =>
@@ -31,19 +33,20 @@ function renderWhitepapers() {
   const list = document.getElementById('whitepaperList');
   if (!list) return;
 
-  list.innerHTML = WHITEPAPERS.map((wp, i) => `
+  list.innerHTML = WHITEPAPERS.map((wp) => `
     <article class="whitepaper-card">
-      <p class="eyebrow wp-topic">${wp.topic}</p>
-      <h3>${wp.title}</h3>
-      <p>${wp.summary}</p>
-      <button class="btn btn-primary" data-wp-index="${i}">Download</button>
+      <p class="eyebrow wp-topic" data-i18n="whitepapers.${wp.id}.topic"></p>
+      <h3 data-i18n="whitepapers.${wp.id}.title"></h3>
+      <p data-i18n="whitepapers.${wp.id}.summary"></p>
+      <button class="btn btn-primary" data-wp-id="${wp.id}" data-i18n="card.download">Download</button>
     </article>
   `).join('');
+  applyTranslations();
 
   list.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-wp-index]');
+    const btn = e.target.closest('[data-wp-id]');
     if (!btn) return;
-    openModal(parseInt(btn.dataset.wpIndex, 10));
+    openModal(btn.dataset.wpId);
   });
 }
 
@@ -52,13 +55,14 @@ function showAlert(type, message) {
   alertArea.innerHTML = `
     <div class="alert alert-${type} alert-dismissible fade show" role="alert">
       ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" data-i18n-aria="modal.close"></button>
     </div>`;
+  applyTranslations();
 }
 
 function setLoading(isLoading) {
   submitBtn.disabled = isLoading;
-  btnText.textContent = isLoading ? 'Submitting…' : 'Download Now';
+  btnText.textContent = t(isLoading ? 'modal.loading' : 'modal.submitBtn');
   btnSpinner.classList.toggle('d-none', !isLoading);
 }
 
@@ -112,13 +116,13 @@ form.addEventListener('submit', async (e) => {
     await submitForm(data);
     const downloadUrl = `https://docs.google.com/uc?export=download&id=${activeFileId}`;
     setTimeout(() => window.open(downloadUrl, '_blank'), 1000);
-    showAlert('success', 'Your download is starting — check your browser!');
+    showAlert('success', t('alert.success'));
     form.reset();
     ['firstName', 'lastName', 'company', 'email'].forEach(name =>
       form.elements[name].classList.remove('is-invalid')
     );
   } catch (err) {
-    showAlert('danger', 'Something went wrong. Please try again or contact us directly.');
+    showAlert('danger', t('alert.error'));
   } finally {
     setLoading(false);
   }
