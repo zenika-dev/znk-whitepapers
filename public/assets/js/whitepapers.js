@@ -14,7 +14,7 @@ const WHITEPAPERS = [
         title:   'Le Manifeste du Développement Agentique',
         topic:   'Ingénierie IA',
         summary: "Ce livre blanc présente un cadre pratique permettant aux équipes d'ingénierie d'adopter l'IA agentique de manière méthodique, de rester indépendantes des fournisseurs et de transformer les gains individuels en performance organisationnelle durable.",
-        fileId:  '1y2z4QjdMCenpqoj1pxIYiKdZBUdJvcWk',
+        fileId:  '1cw6ThjO_fVtShd3HEPsq5r-ysDG-RIF7',
       },
     },
   },
