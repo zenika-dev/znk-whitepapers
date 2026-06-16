@@ -775,3 +775,14 @@ label.form-label .required {
   color: #dc3545;
   font-weight: bold;
 }
+
+/* ── Language dropdown ── */
+#langDropdown:hover,
+#langDropdown:focus,
+#langDropdown:active,
+#langDropdown.show {
+  background: transparent;
+  color: inherit;
+  box-shadow: var(--shadow-soft);
+}
+
