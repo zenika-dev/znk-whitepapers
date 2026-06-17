@@ -1,7 +1,7 @@
 const DEPLOYMENT_ID = "AKfycbzrF-vwmovqv0taB9Si3A7UUlY5B9-QyipKsKQLrCLOt8G51AD6iKeWCQvCV9cwRmI9JA";
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrF-vwmovqv0taB9Si3A7UUlY5B9-QyipKsKQLrCLOt8G51AD6iKeWCQvCV9cwRmI9JA/exec';
 
-let activeFileId = null;
+let activeFilePath = null;
 
 // ── Form refs (declared early — used in openModal) ────────────────────────────
 const form       = document.getElementById('download-form');
@@ -17,7 +17,7 @@ let bsModal = null;
 function openModal(id) {
   const wp = WHITEPAPERS.find(w => w.id === id);
   const locale = wp.locales[currentLang] ?? wp.locales.en;
-  activeFileId = locale.fileId;
+  activeFilePath = locale.filePath;
   downloadBodyTitle.setAttribute('data-i18n', 'whitepapers.' + id + '.title');
   applyTranslations();
   alertArea.innerHTML = '';
@@ -117,8 +117,18 @@ form.addEventListener('submit', async (e) => {
 
   try {
     await submitForm(data);
-    const downloadUrl = `https://docs.google.com/uc?export=download&id=${activeFileId}`;
-    setTimeout(() => window.open(downloadUrl, '_blank'), 1000);
+    setTimeout(async () => {
+      const res = await fetch(activeFilePath);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = activeFilePath.split('/').pop();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    }, 1000);
     showAlert('success', t('alert.success'));
     form.reset();
     ['firstName', 'lastName', 'company', 'email'].forEach(name =>
