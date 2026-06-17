@@ -4,7 +4,7 @@ Static landing page for Zenika's technical whitepapers. No build step — plain 
 
 ## Where is it
 
-Deployed to [whitepaper.zenika.com](https://whitepaper.zenika.com) subdomain
+Deployed to [whitepaper.zenika.sg](https://whitepaper.zenika.sg) subdomain. any PRs merged to main will automatically deploy to this subdomain.
 
 ## What it does
 
