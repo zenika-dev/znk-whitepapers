@@ -32,13 +32,21 @@ function applyTranslations() {
 
 function setLanguage(lang) {
   currentLang = lang;
-  localStorage.setItem('lang', lang);
+  const url = new URL(window.location);
+  url.searchParams.set('lang', lang);
+  history.replaceState(null, '', url);
   applyTranslations();
 }
 
 (function () {
-  const stored = localStorage.getItem('lang');
-  currentLang = stored || (navigator.language.startsWith('fr') ? 'fr' : 'en');
+  const params = new URLSearchParams(window.location.search);
+  const urlLang = params.get('lang');
+  const browserLang = navigator.language.startsWith('fr') ? 'fr' : 'en';
+  currentLang = (urlLang === 'en' || urlLang === 'fr') ? urlLang
+    : browserLang;
+  const url = new URL(window.location);
+  url.searchParams.set('lang', currentLang);
+  history.replaceState(null, '', url);
 })();
 
 document.addEventListener('DOMContentLoaded', applyTranslations);
