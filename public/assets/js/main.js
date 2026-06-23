@@ -1,7 +1,7 @@
-const DEPLOYMENT_ID = "AKfycbzrF-vwmovqv0taB9Si3A7UUlY5B9-QyipKsKQLrCLOt8G51AD6iKeWCQvCV9cwRmI9JA";
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrF-vwmovqv0taB9Si3A7UUlY5B9-QyipKsKQLrCLOt8G51AD6iKeWCQvCV9cwRmI9JA/exec';
+const DEPLOYMENT_ID = "AKfycbxY-DJKaHcDrglcp42UPuaoJdToZiK0BOXthoIXxrBbS0pAtoRYlOTHnPAeo6Rai04e";
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxY-DJKaHcDrglcp42UPuaoJdToZiK0BOXthoIXxrBbS0pAtoRYlOTHnPAeo6Rai04e/exec';
 
-let activeFilePath = null;
+let activeWhitepaperId = null;
 
 // ── Form refs (declared early — used in openModal) ────────────────────────────
 const form       = document.getElementById('download-form');
@@ -16,8 +16,7 @@ let bsModal = null;
 
 function openModal(id) {
   const wp = WHITEPAPERS.find(w => w.id === id);
-  const locale = wp.locales[currentLang] ?? wp.locales.en;
-  activeFilePath = locale.filePath;
+  activeWhitepaperId = wp?.id ?? null;
   downloadBodyTitle.setAttribute('data-i18n', 'whitepapers.' + id + '.title');
   applyTranslations();
   alertArea.innerHTML = '';
@@ -25,9 +24,20 @@ function openModal(id) {
   ['firstName', 'lastName', 'company', 'email'].forEach(name =>
     form.elements[name].classList.remove('is-invalid')
   );
+  form.elements.downloadLanguage.value = (currentLang === 'fr' || currentLang === 'en') ? currentLang : 'en';
+  form.querySelectorAll('input[name="downloadLanguage"]').forEach((input) => {
+    input.classList.remove('is-invalid');
+  });
   form.elements.consent.checked = true;
   if (!bsModal) bsModal = new bootstrap.Modal(document.getElementById('downloadModal'));
   bsModal.show();
+}
+
+function getFilePathForLanguage(lang) {
+  const wp = WHITEPAPERS.find(w => w.id === activeWhitepaperId);
+  if (!wp) return null;
+  const locale = wp.locales[lang] ?? wp.locales.en;
+  return locale?.filePath ?? null;
 }
 
 // ── Whitepaper cards ──────────────────────────────────────────────────────────
@@ -102,28 +112,38 @@ async function submitForm(data) {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   alertArea.innerHTML = '';
+  const selectedLanguageCode = form.elements.downloadLanguage.value;
 
   const data = {
     firstName: form.elements.firstName.value,
     lastName:  form.elements.lastName.value,
     company:   form.elements.company.value,
     email:     form.elements.email.value,
+    downloadLanguage: selectedLanguageCode,
     consent:   form.elements.consent.checked,
   };
 
   if (!validateForm(data)) return;
+
+  const filePath = getFilePathForLanguage(selectedLanguageCode);
+  if (!filePath) {
+    showAlert('danger', t('alert.error'));
+    return;
+  }
+
+  data.downloadLanguage = selectedLanguageCode === 'fr' ? 'French' : 'English';
 
   setLoading(true);
 
   try {
     await submitForm(data);
     setTimeout(async () => {
-      const res = await fetch(activeFilePath);
+      const res = await fetch(filePath);
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = blobUrl;
-      a.download = activeFilePath.split('/').pop();
+      a.download = filePath.split('/').pop();
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -131,9 +151,13 @@ form.addEventListener('submit', async (e) => {
     }, 1000);
     showAlert('success', t('alert.success'));
     form.reset();
+    form.elements.downloadLanguage.value = (currentLang === 'fr' || currentLang === 'en') ? currentLang : 'en';
     ['firstName', 'lastName', 'company', 'email'].forEach(name =>
       form.elements[name].classList.remove('is-invalid')
     );
+    form.querySelectorAll('input[name="downloadLanguage"]').forEach((input) => {
+      input.classList.remove('is-invalid');
+    });
   } catch (err) {
     showAlert('danger', t('alert.error'));
   } finally {
