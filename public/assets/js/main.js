@@ -25,9 +25,6 @@ function openModal(id) {
     form.elements[name].classList.remove('is-invalid')
   );
   form.elements.downloadLanguage.value = (currentLang === 'fr' || currentLang === 'en') ? currentLang : 'en';
-  form.querySelectorAll('input[name="downloadLanguage"]').forEach((input) => {
-    input.classList.remove('is-invalid');
-  });
   form.elements.consent.checked = true;
   if (!bsModal) bsModal = new bootstrap.Modal(document.getElementById('downloadModal'));
   bsModal.show();
@@ -126,10 +123,6 @@ form.addEventListener('submit', async (e) => {
   if (!validateForm(data)) return;
 
   const filePath = getFilePathForLanguage(selectedLanguageCode);
-  if (!filePath) {
-    showAlert('danger', t('alert.error'));
-    return;
-  }
 
   data.downloadLanguage = selectedLanguageCode === 'fr' ? 'French' : 'English';
 
@@ -151,13 +144,9 @@ form.addEventListener('submit', async (e) => {
     }, 1000);
     showAlert('success', t('alert.success'));
     form.reset();
-    form.elements.downloadLanguage.value = (currentLang === 'fr' || currentLang === 'en') ? currentLang : 'en';
     ['firstName', 'lastName', 'company', 'email'].forEach(name =>
       form.elements[name].classList.remove('is-invalid')
     );
-    form.querySelectorAll('input[name="downloadLanguage"]').forEach((input) => {
-      input.classList.remove('is-invalid');
-    });
   } catch (err) {
     showAlert('danger', t('alert.error'));
   } finally {
