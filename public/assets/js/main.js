@@ -9,6 +9,7 @@ const alertArea  = document.getElementById('alert-area');
 const firstNameInput = document.getElementById('firstName');
 const lastNameInput = document.getElementById('lastName');
 const companyInput = document.getElementById('company');
+const jobTitleInput = document.getElementById('jobTitle');
 const emailInput = document.getElementById('email');
 const consentInput = document.getElementById('consent');
 
@@ -23,7 +24,7 @@ function openModal(id) {
   applyTranslations();
   alertArea.innerHTML = '';
   form.reset();
-  [firstNameInput, lastNameInput, companyInput, emailInput].forEach(input =>
+  [firstNameInput, lastNameInput, companyInput, jobTitleInput, emailInput].forEach(input =>
     input.classList.remove('is-invalid')
   );
   form.elements.downloadLanguage.value = (currentLang === 'fr' || currentLang === 'en') ? currentLang : 'en';
@@ -114,6 +115,7 @@ form.addEventListener('submit', async (e) => {
     firstName: firstNameInput.value,
     lastName:  lastNameInput.value,
     company:   companyInput.value,
+    job_title: jobTitleInput.value,
     email:     emailInput.value,
     downloadLanguage: selectedLanguageCode,
     consent:   consentInput.checked,
@@ -148,7 +150,7 @@ form.addEventListener('submit', async (e) => {
     }, 1000);
     showAlert('success', t('alert.success'));
     form.reset();
-    [firstNameInput, lastNameInput, companyInput, emailInput].forEach(input =>
+    [firstNameInput, lastNameInput, companyInput, jobTitleInput, emailInput].forEach(input =>
       input.classList.remove('is-invalid')
     );
   } catch (err) {
