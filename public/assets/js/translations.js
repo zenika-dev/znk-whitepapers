@@ -16,7 +16,7 @@ const TRANSLATIONS = {
     'modal.downloadLanguageLabel': 'Download language',
     'modal.requiredError': 'Required.',
     'modal.emailError': 'Enter a valid email.',
-    'modal.consentLabel': 'I consent to the use of my information to contact me via email, phone, or SMS regarding my inquiry, with the option to opt out at any time.',
+    'modal.consentLabel': 'I agree to receive the requested content and occasional updates from Zenika regarding related insights, events and services.',
     'modal.close': 'Close',
     'modal.submitBtn': 'Download Now',
     'modal.loading': 'Submitting…',
