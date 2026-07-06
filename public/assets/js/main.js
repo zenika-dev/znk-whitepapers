@@ -27,7 +27,6 @@ function openModal(id) {
   [firstNameInput, lastNameInput, companyInput, jobTitleInput, emailInput].forEach(input =>
     input.classList.remove('is-invalid')
   );
-  form.elements.downloadLanguage.value = (currentLang === 'fr' || currentLang === 'en') ? currentLang : 'en';
   consentInput.checked = true;
   if (!bsModal) bsModal = new bootstrap.Modal(document.getElementById('downloadModal'));
   bsModal.show();
@@ -109,7 +108,6 @@ function validateForm(data) {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   alertArea.innerHTML = '';
-  const selectedLanguageCode = form.elements.downloadLanguage.value;
 
   const data = {
     firstName: firstNameInput.value,
@@ -117,37 +115,17 @@ form.addEventListener('submit', async (e) => {
     company:   companyInput.value,
     job_title: jobTitleInput.value,
     email:     emailInput.value,
-    downloadLanguage: selectedLanguageCode,
     consent:   consentInput.checked,
   };
 
   if (!validateForm(data)) return;
 
-  const filePath = getFilePathForLanguage(selectedLanguageCode);
-
-  const downloadLanguageLabel = selectedLanguageCode === 'fr' ? 'French' : 'English';
-
   setLoading(true);
 
   try {
     form.elements.OPT_IN.value = data.consent ? '1' : '0';
-    form.elements.DOWNLOAD_LANGUAGE.value = downloadLanguageLabel;
-    form.elements.locale.value = selectedLanguageCode;
 
     form.submit();
-
-    setTimeout(async () => {
-      const res = await fetch(filePath);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filePath.split('/').pop();
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    }, 1000);
     showAlert('success', t('alert.success'));
     form.reset();
     [firstNameInput, lastNameInput, companyInput, jobTitleInput, emailInput].forEach(input =>
