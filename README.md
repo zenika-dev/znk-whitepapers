@@ -57,6 +57,16 @@ The card renders automatically; no other changes needed.
 
 Add the key/value to both `en` and `fr` objects in [translations.js](public/assets/js/translations.js), then reference it with `data-i18n="your.key"` in HTML or `t('your.key')` in JS.
 
-## Backend (Google Apps Script)
+## Backend (Brevo form endpoint via iframe)
 
-The form POSTs to the URL in `APPS_SCRIPT_URL` ([main.js:2](public/assets/js/main.js#L2)). The script should accept `firstName`, `lastName`, `company`, `email`, and `consent` fields and append them to a Sheet. After a successful POST the page opens `https://docs.google.com/uc?export=download&id=<fileId>` in a new tab.
+The download form submits directly to a Brevo hosted form endpoint from [`index.html`](public/index.html#L107), using:
+
+- `method="POST"`
+- `action="https://94c07529.sibforms.com/serve/..."`
+- `target="brevo-target"` (a hidden iframe defined in [`index.html`](public/index.html#L106))
+
+Field names are Brevo-compatible (`FIRSTNAME`, `LASTNAME`, `COMPANY`, `JOB_TITLE`, `EMAIL`).
+
+On submit, [`main.js`](public/assets/js/main.js#L111) updates hidden `OPT_IN` (`1`/`0`) from the consent checkbox, then calls `form.submit()` so the POST is sent in the iframe without leaving the page.
+
+There is no custom backend service in this repository for lead capture; Brevo handles the POST target.

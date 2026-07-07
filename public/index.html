@@ -103,14 +103,17 @@
           <h5 class="modal-title" id="downloadModalBodyTitle"></h5>
           <p class="modal-form-text" data-i18n="modal.formText">Fill in your details to download the whitepaper instantly.</p>
           <div id="alert-area"></div>
-          <form id="download-form" novalidate>
+          <iframe name="brevo-target" style="display:none"></iframe>
+          <form id="download-form" method="POST" target="brevo-target"
+            action="https://94c07529.sibforms.com/serve/MUIFAExUkbh6-iPXYQ3tMl_RMKKfaAVDP_STHx-MU1oGpp3w58CKA37YuQTjjRWO1pt_Cmb1l6DvtK9oFOqWTXMfUPw3PzrW2tSJDkm-ITwAOpoeE2_s91VTH9ecUAQKWgIdE1JlUom_jMOZU_YXzJXbVg2ZVdYl4VIe9Z-fJGcnE7VnlD16bsHAihEtECB9mcuoY9BdHUIn12fM"
+            novalidate>
             <div class="row g-3">
               <div class="col-6">
                 <label for="firstName" class="form-label">
                   <span data-i18n="modal.firstNameLabel">First Name</span>
                   <span class="required">*</span>
                 </label>
-                <input type="text" class="form-control" id="firstName" name="firstName" autocomplete="given-name"
+                <input type="text" class="form-control" id="firstName" name="FIRSTNAME" autocomplete="given-name"
                   required />
                 <div class="invalid-feedback" data-i18n="modal.requiredError">Required.</div>
               </div>
@@ -119,7 +122,7 @@
                   <span data-i18n="modal.lastNameLabel">Last Name</span>
                   <span class="required">*</span>
                 </label>
-                <input type="text" class="form-control" id="lastName" name="lastName" autocomplete="family-name"
+                <input type="text" class="form-control" id="lastName" name="LASTNAME" autocomplete="family-name"
                   required />
                 <div class="invalid-feedback" data-i18n="modal.requiredError">Required.</div>
               </div>
@@ -128,41 +131,36 @@
                   <span data-i18n="modal.companyLabel">Company</span>
                   <span class="required">*</span>
                 </label>
-                <input type="text" class="form-control" id="company" name="company" autocomplete="organization"
+                <input type="text" class="form-control" id="company" name="COMPANY" autocomplete="organization"
                   required />
                 <div class="invalid-feedback" data-i18n="modal.requiredError">Required.</div>
+              </div>
+              <div class="col-12">
+                <label for="jobTitle" class="form-label">
+                  <span data-i18n="modal.jobTitleLabel">Job Title</span>
+                </label>
+                <input type="text" class="form-control" id="jobTitle" name="JOB_TITLE" autocomplete="organization" />
               </div>
               <div class="col-12">
                 <label for="email" class="form-label">
                   <span data-i18n="modal.emailLabel">Email address</span>
                   <span class="required">*</span>
                 </label>
-                <input type="email" class="form-control" id="email" name="email" autocomplete="email" required />
+                <input type="email" class="form-control" id="email" name="EMAIL" autocomplete="email" required />
                 <div class="invalid-feedback" data-i18n="modal.emailError">Enter a valid email.</div>
               </div>
               <div class="col-12">
-                <label class="form-label">
-                  <span data-i18n="modal.downloadLanguageLabel">Download language</span>
-                </label>
-                <div id="downloadLanguageGroup" class="d-flex gap-4">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="downloadLanguage" id="downloadLanguageEn" value="en" checked>
-                    <label class="form-check-label" for="downloadLanguageEn" data-i18n="modal.languageChoiceEnglish">English</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="downloadLanguage" id="downloadLanguageFr" value="fr">
-                    <label class="form-check-label" for="downloadLanguageFr" data-i18n="modal.languageChoiceFrench">French</label>
-                  </div>
-                </div>
-              </div>
-              <div class="col-12">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="consent" name="consent" checked />
+                  <input class="form-check-input" type="checkbox" id="consent" name="consent" value="1" checked />
                   <label class="form-check-label" for="consent">
-                    <span data-i18n="modal.consentLabel">I consent to the use of my information to contact me via email, phone, or SMS regarding my inquiry, with the option to opt out at any time.</span>
+                    <span data-i18n="modal.consentLabel">I agree to receive the requested content and occasional updates from Zenika regarding related insights, events and services.</span>
                   </label>
                 </div>
               </div>
+              <input type="hidden" name="OPT_IN" id="brevoOptIn" value="0">
+              <input type="hidden" name="email_address_check" value="">
+              <input type="hidden" name="locale" value="en">
+              <input type="hidden" name="html_type" value="simple">
             </div>
           </form>
         </div>

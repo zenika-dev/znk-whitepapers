@@ -1,6 +1,3 @@
-const DEPLOYMENT_ID = "AKfycbxY-DJKaHcDrglcp42UPuaoJdToZiK0BOXthoIXxrBbS0pAtoRYlOTHnPAeo6Rai04e";
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxY-DJKaHcDrglcp42UPuaoJdToZiK0BOXthoIXxrBbS0pAtoRYlOTHnPAeo6Rai04e/exec';
-
 let activeWhitepaperId = null;
 
 // ── Form refs (declared early — used in openModal) ────────────────────────────
@@ -9,6 +6,12 @@ const submitBtn  = document.getElementById('submit-btn');
 const btnText    = document.getElementById('btn-text');
 const btnSpinner = document.getElementById('btn-spinner');
 const alertArea  = document.getElementById('alert-area');
+const firstNameInput = document.getElementById('firstName');
+const lastNameInput = document.getElementById('lastName');
+const companyInput = document.getElementById('company');
+const jobTitleInput = document.getElementById('jobTitle');
+const emailInput = document.getElementById('email');
+const consentInput = document.getElementById('consent');
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 const downloadBodyTitle = document.getElementById('downloadModalBodyTitle');
@@ -21,20 +24,12 @@ function openModal(id) {
   applyTranslations();
   alertArea.innerHTML = '';
   form.reset();
-  ['firstName', 'lastName', 'company', 'email'].forEach(name =>
-    form.elements[name].classList.remove('is-invalid')
+  [firstNameInput, lastNameInput, companyInput, jobTitleInput, emailInput].forEach(input =>
+    input.classList.remove('is-invalid')
   );
-  form.elements.downloadLanguage.value = (currentLang === 'fr' || currentLang === 'en') ? currentLang : 'en';
-  form.elements.consent.checked = true;
+  consentInput.checked = true;
   if (!bsModal) bsModal = new bootstrap.Modal(document.getElementById('downloadModal'));
   bsModal.show();
-}
-
-function getFilePathForLanguage(lang) {
-  const wp = WHITEPAPERS.find(w => w.id === activeWhitepaperId);
-  if (!wp) return null;
-  const locale = wp.locales[lang] ?? wp.locales.en;
-  return locale?.filePath ?? null;
 }
 
 // ── Whitepaper cards ──────────────────────────────────────────────────────────
@@ -82,10 +77,15 @@ function validateEmail(value) {
 function validateForm(data) {
   let valid = true;
 
-  ['firstName', 'lastName', 'company', 'email'].forEach(name => {
-    const input = form.elements[name];
-    const empty = !data[name].trim();
-    const badEmail = name === 'email' && !empty && !validateEmail(data[name]);
+  [
+    [firstNameInput, data.firstName],
+    [lastNameInput, data.lastName],
+    [companyInput, data.company],
+    [emailInput, data.email],
+  ].forEach(([input, value], index) => {
+    const field = ['firstName', 'lastName', 'company', 'email'][index];
+    const empty = !value.trim();
+    const badEmail = field === 'email' && !empty && !validateEmail(value);
 
     if (empty || badEmail) {
       input.classList.add('is-invalid');
@@ -98,54 +98,31 @@ function validateForm(data) {
   return valid;
 }
 
-async function submitForm(data) {
-  await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: new URLSearchParams(data),
-  });
-}
-
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   alertArea.innerHTML = '';
-  const selectedLanguageCode = form.elements.downloadLanguage.value;
 
   const data = {
-    firstName: form.elements.firstName.value,
-    lastName:  form.elements.lastName.value,
-    company:   form.elements.company.value,
-    email:     form.elements.email.value,
-    downloadLanguage: selectedLanguageCode,
-    consent:   form.elements.consent.checked,
+    firstName: firstNameInput.value,
+    lastName:  lastNameInput.value,
+    company:   companyInput.value,
+    job_title: jobTitleInput.value,
+    email:     emailInput.value,
+    consent:   consentInput.checked,
   };
 
   if (!validateForm(data)) return;
 
-  const filePath = getFilePathForLanguage(selectedLanguageCode);
-
-  data.downloadLanguage = selectedLanguageCode === 'fr' ? 'French' : 'English';
-
   setLoading(true);
 
   try {
-    await submitForm(data);
-    setTimeout(async () => {
-      const res = await fetch(filePath);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filePath.split('/').pop();
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    }, 1000);
+    form.elements.OPT_IN.value = data.consent ? '1' : '0';
+
+    form.submit();
     showAlert('success', t('alert.success'));
     form.reset();
-    ['firstName', 'lastName', 'company', 'email'].forEach(name =>
-      form.elements[name].classList.remove('is-invalid')
+    [firstNameInput, lastNameInput, companyInput, jobTitleInput, emailInput].forEach(input =>
+      input.classList.remove('is-invalid')
     );
   } catch (err) {
     showAlert('danger', t('alert.error'));
