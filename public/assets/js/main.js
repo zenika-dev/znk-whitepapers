@@ -32,13 +32,6 @@ function openModal(id) {
   bsModal.show();
 }
 
-function getFilePathForLanguage(lang) {
-  const wp = WHITEPAPERS.find(w => w.id === activeWhitepaperId);
-  if (!wp) return null;
-  const locale = wp.locales[lang] ?? wp.locales.en;
-  return locale?.filePath ?? null;
-}
-
 // ── Whitepaper cards ──────────────────────────────────────────────────────────
 function renderWhitepapers() {
   const list = document.getElementById('whitepaperList');
