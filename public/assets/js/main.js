@@ -37,17 +37,25 @@ function renderWhitepapers() {
   const list = document.getElementById('whitepaperList');
   if (!list) return;
 
-  list.innerHTML = WHITEPAPERS.map((wp) => `
+  list.innerHTML = WHITEPAPERS.map((wp) => {
+    const cover = wp.covers?.[currentLang] || wp.covers?.en;
+    const hasDetail = !!wp.locales?.en?.detail;
+    return `
     <article class="whitepaper-card">
-      <p class="eyebrow wp-topic" data-i18n="whitepapers.${wp.id}.topic"></p>
-      <h3 data-i18n="whitepapers.${wp.id}.title"></h3>
-      <p data-i18n="whitepapers.${wp.id}.summary"></p>
-      <div class="card-actions">
-        ${wp.locales?.en?.detail ? `<button class="btn btn-outline-secondary" data-wp-read="${wp.id}" data-i18n="card.readMore">Read preview</button>` : ''}
-        <button class="btn btn-primary" data-wp-id="${wp.id}" data-i18n="card.download">Download</button>
+      ${cover ? `
+      <button class="wp-card-cover-btn" type="button" ${hasDetail ? `data-wp-read="${wp.id}"` : `data-wp-id="${wp.id}"`} tabindex="-1" aria-hidden="true">
+        <img class="wp-card-cover" src="${cover}" alt="" />
+      </button>` : ''}
+      <div class="wp-card-body">
+        <p class="eyebrow wp-topic" data-i18n="whitepapers.${wp.id}.topic"></p>
+        <h3 data-i18n="whitepapers.${wp.id}.title"></h3>
+        <div class="card-actions">
+          ${hasDetail ? `<button class="btn btn-outline-secondary" data-wp-read="${wp.id}" data-i18n="card.readMore">Read preview</button>` : ''}
+          <button class="btn btn-primary" data-wp-id="${wp.id}" data-i18n="card.download">Download</button>
+        </div>
       </div>
-    </article>
-  `).join('');
+    </article>`;
+  }).join('');
   applyTranslations();
 
   list.addEventListener('click', (e) => {
@@ -84,11 +92,13 @@ function detailData(id) {
 function renderDetail(id) {
   const data = detailData(id);
   if (!detailSection || !data) return false;
-  const { d } = data;
+  const { wp, d } = data;
+
+  const cover = wp.covers?.[currentLang] || wp.covers?.en;
 
   const takeaways = (d.takeaways || []).map((t) => `
     <li class="detail-takeaway">
-      <span class="detail-takeaway-icon" aria-hidden="true">${escapeHtml(t.icon || '•')}</span>
+      <span class="detail-takeaway-num" aria-hidden="true"></span>
       <div>
         <h3>${escapeHtml(t.title)}</h3>
         <p>${escapeHtml(t.text)}</p>
@@ -108,38 +118,54 @@ function renderDetail(id) {
         <span aria-hidden="true">←</span> <span data-i18n="detail.back">Back to whitepapers</span>
       </button>
 
-      <header class="detail-head">
-        <p class="eyebrow" data-i18n="whitepapers.${id}.topic"></p>
-        <h1 data-i18n="whitepapers.${id}.title"></h1>
-        ${d.published ? `<p class="detail-meta">${escapeHtml(d.published)}</p>` : ''}
-        <p class="detail-lead">${escapeHtml(d.lead)}</p>
-        ${d.ship ? `<p class="detail-ship">${escapeHtml(d.ship)}</p>` : ''}
-      </header>
+      <div class="detail-layout">
+        <div class="detail-main">
+          <header class="detail-head-copy">
+            <p class="eyebrow" data-i18n="whitepapers.${id}.topic"></p>
+            <h1 data-i18n="whitepapers.${id}.title"></h1>
+            ${d.published ? `<p class="detail-meta">${escapeHtml(d.published)}</p>` : ''}
+            <p class="detail-lead">${escapeHtml(d.lead)}</p>
+            ${d.ship ? `<p class="detail-ship">${escapeHtml(d.ship)}</p>` : ''}
+            <div class="detail-head-cta">
+              <button class="btn btn-primary" type="button" data-wp-id="${id}" data-i18n="detail.cta">Download the full whitepaper</button>
+              <p class="detail-cta-note" data-i18n="detail.ctaNote"></p>
+            </div>
+          </header>
 
-      ${d.quote ? `<blockquote class="detail-quote">${escapeHtml(d.quote)}</blockquote>` : ''}
+          ${d.quote ? `<blockquote class="detail-quote">${escapeHtml(d.quote)}</blockquote>` : ''}
 
-      ${takeaways ? `
-      <section class="detail-block">
-        <h2 data-i18n="detail.takeawaysTitle">What you'll learn</h2>
-        <ul class="detail-takeaways">${takeaways}</ul>
-      </section>` : ''}
+          ${takeaways ? `
+          <section class="detail-block">
+            <h2 data-i18n="detail.takeawaysTitle">What you'll learn</h2>
+            <ul class="detail-takeaways">${takeaways}</ul>
+          </section>` : ''}
 
-      ${stats ? `
-      <section class="detail-block">
-        <h2 data-i18n="detail.statsTitle">By the numbers</h2>
-        <div class="detail-stats">${stats}</div>
-      </section>` : ''}
+          ${stats ? `
+          <section class="detail-block">
+            <h2 data-i18n="detail.statsTitle">By the numbers</h2>
+            <div class="detail-stats">${stats}</div>
+          </section>` : ''}
 
-      <div class="detail-cta">
-        <button class="btn btn-primary" type="button" data-wp-id="${id}" data-i18n="detail.cta">Download the full whitepaper</button>
-        <p class="detail-cta-note" data-i18n="detail.ctaNote"></p>
+          <div class="detail-cta">
+            <button class="btn btn-primary" type="button" data-wp-id="${id}" data-i18n="detail.cta">Download the full whitepaper</button>
+            <p class="detail-cta-note" data-i18n="detail.ctaNote"></p>
+          </div>
+        </div>
+
+        ${cover ? `
+        <aside class="detail-sidebar">
+          <button class="detail-cover-wrap" type="button" data-wp-id="${id}" aria-label="Download this whitepaper">
+            <img class="detail-cover" src="${escapeHtml(cover)}" alt="" aria-hidden="true" />
+            <span class="detail-cover-hint" data-i18n="detail.cta">Download the full whitepaper</span>
+          </button>
+        </aside>` : ''}
       </div>
     </div>`;
 
-  detailSection.querySelector('#detail-back')
-    .addEventListener('click', () => closeDetail());
-  detailSection.querySelector('[data-wp-id]')
-    .addEventListener('click', (e) => openModal(e.currentTarget.dataset.wpId));
+  detailSection.querySelectorAll('#detail-back')
+    .forEach(el => el.addEventListener('click', () => closeDetail()));
+  detailSection.querySelectorAll('[data-wp-id]')
+    .forEach(el => el.addEventListener('click', (e) => openModal(e.currentTarget.dataset.wpId)));
 
   applyTranslations();
   return true;
@@ -188,6 +214,7 @@ function syncDetailFromUrl(push) {
 window.addEventListener('popstate', () => syncDetailFromUrl(false));
 document.addEventListener('langchange', () => {
   if (activeDetailId) renderDetail(activeDetailId);
+  else renderWhitepapers();
 });
 
 // ── Form handling ─────────────────────────────────────────────────────────────
