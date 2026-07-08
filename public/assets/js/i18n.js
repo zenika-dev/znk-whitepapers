@@ -36,6 +36,7 @@ function setLanguage(lang) {
   url.searchParams.set('lang', lang);
   history.replaceState(null, '', url);
   applyTranslations();
+  document.dispatchEvent(new CustomEvent('langchange', { detail: { lang } }));
 }
 
 (function () {

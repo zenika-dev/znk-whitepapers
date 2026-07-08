@@ -24,6 +24,26 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7/css/flag-icons.min.css" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-zenika.png" />
+
+  <!-- Structured data: helps search engines surface the whitepaper preview.
+       Authors are intentionally omitted (not published on this site). -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "The Agentic Development Manifesto",
+    "description": "A practical framework for engineering teams to adopt agentic AI methodically, stay vendor-independent, and turn individual gains into durable organisational performance.",
+    "about": "Agentic AI software development",
+    "inLanguage": ["en", "fr"],
+    "datePublished": "2026-06",
+    "url": "https://whitepaper.zenika.sg/?paper=agentic-manifesto",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Zenika",
+      "url": "https://www.zenika.com/en-SG"
+    }
+  }
+  </script>
 </head>
 
 <body>
@@ -88,6 +108,11 @@
           <!-- Rendered via JS -->
         </div>
       </div>
+    </section>
+
+    <!-- Whitepaper detail / preview view (rendered via JS, shown on ?paper=<id>) -->
+    <section class="section detail-section" id="whitepaperDetail" hidden>
+      <!-- Rendered via JS -->
     </section>
   </main>
 
