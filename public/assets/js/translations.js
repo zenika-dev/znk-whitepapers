@@ -35,7 +35,7 @@ const TRANSLATIONS = {
   },
   fr: {
     'header.homeLabel': 'Accueil Zenika Whitepaper',
-    'hero.title': 'Des livres blancs professionnels pour les équipes qui livrent.',
+    'hero.title': "L’expertise terrain en livres blancs pour les équipes qui font bouger les lignes.",
     'hero.text': "Les guides experts de Zenika donnent à votre équipe la clarté technique pour avancer plus vite et construire avec confiance — quel que soit le défi.",
     'hero.cta': 'Explorer nos livres blancs',
     'section.eyebrow': 'Nos Livres Blancs',
