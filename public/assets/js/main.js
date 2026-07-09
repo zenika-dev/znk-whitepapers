@@ -280,6 +280,7 @@ form.addEventListener('submit', async (e) => {
 
   try {
     form.elements.OPT_IN.value = data.consent ? '1' : '0';
+    form.elements.locale.value = currentLang;
 
     form.submit();
     showAlert('success', t('alert.success'));
