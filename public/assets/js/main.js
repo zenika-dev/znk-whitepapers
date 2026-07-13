@@ -1,17 +1,18 @@
 let activeWhitepaperId = null;
 
 // ── Form refs (declared early — used in openModal) ────────────────────────────
-const form       = document.getElementById('download-form');
+const forms = [
+    document.getElementById('download-form-en'),
+    document.getElementById('download-form-fr')
+].filter(Boolean);
 const submitBtn  = document.getElementById('submit-btn');
 const btnText    = document.getElementById('btn-text');
 const btnSpinner = document.getElementById('btn-spinner');
 const alertArea  = document.getElementById('alert-area');
-const firstNameInput = document.getElementById('firstName');
-const lastNameInput = document.getElementById('lastName');
-const companyInput = document.getElementById('company');
-const jobTitleInput = document.getElementById('jobTitle');
+const fullNameInput = document.getElementById('fullName');
 const emailInput = document.getElementById('email');
 const consentInput = document.getElementById('consent');
+const emailFrInput = document.getElementById('email-fr');
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
 const downloadBodyTitle = document.getElementById('downloadModalBodyTitle');
@@ -23,11 +24,14 @@ function openModal(id) {
   downloadBodyTitle.setAttribute('data-i18n', 'whitepapers.' + id + '.title');
   applyTranslations();
   alertArea.innerHTML = '';
-  form.reset();
-  [firstNameInput, lastNameInput, companyInput, jobTitleInput, emailInput].forEach(input =>
-    input.classList.remove('is-invalid')
+  const activeForm = currentLang === 'fr'
+    ? document.getElementById('download-form-fr')
+    : document.getElementById('download-form-en');
+  activeForm?.reset();
+  [fullNameInput, emailInput, emailFrInput].forEach(input =>
+    input?.classList.remove('is-invalid')
   );
-  consentInput.checked = true;
+  if (consentInput) consentInput.checked = true;
   if (!bsModal) bsModal = new bootstrap.Modal(document.getElementById('downloadModal'));
   bsModal.show();
 }
@@ -237,62 +241,70 @@ function validateEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function validateForm(data) {
+function validateEnglishForm() {
   let valid = true;
 
-  [
-    [firstNameInput, data.firstName],
-    [lastNameInput, data.lastName],
-    [companyInput, data.company],
-    [emailInput, data.email],
-  ].forEach(([input, value], index) => {
-    const field = ['firstName', 'lastName', 'company', 'email'][index];
-    const empty = !value.trim();
-    const badEmail = field === 'email' && !empty && !validateEmail(value);
+  const nameEmpty = !fullNameInput.value.trim();
+  if (nameEmpty) {
+    fullNameInput.classList.add('is-invalid');
+    valid = false;
+  } else {
+    fullNameInput.classList.remove('is-invalid');
+  }
 
-    if (empty || badEmail) {
-      input.classList.add('is-invalid');
-      valid = false;
-    } else {
-      input.classList.remove('is-invalid');
-    }
-  });
+  const emailValue = emailInput.value;
+  const emailEmpty = !emailValue.trim();
+  const emailBad = !emailEmpty && !validateEmail(emailValue);
+  if (emailEmpty || emailBad) {
+    emailInput.classList.add('is-invalid');
+    valid = false;
+  } else {
+    emailInput.classList.remove('is-invalid');
+  }
 
   return valid;
 }
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  alertArea.innerHTML = '';
+function validateFrenchForm() {
+  const emailValue = emailFrInput.value;
+  const emailEmpty = !emailValue.trim();
+  const emailBad = !emailEmpty && !validateEmail(emailValue);
 
-  const data = {
-    firstName: firstNameInput.value,
-    lastName:  lastNameInput.value,
-    company:   companyInput.value,
-    job_title: jobTitleInput.value,
-    email:     emailInput.value,
-    consent:   consentInput.checked,
-  };
-
-  if (!validateForm(data)) return;
-
-  setLoading(true);
-
-  try {
-    form.elements.OPT_IN.value = data.consent ? '1' : '0';
-    form.elements.locale.value = currentLang;
-
-    form.submit();
-    showAlert('success', t('alert.success'));
-    form.reset();
-    [firstNameInput, lastNameInput, companyInput, jobTitleInput, emailInput].forEach(input =>
-      input.classList.remove('is-invalid')
-    );
-  } catch (err) {
-    showAlert('danger', t('alert.error'));
-  } finally {
-    setLoading(false);
+  if (emailEmpty || emailBad) {
+    emailFrInput.classList.add('is-invalid');
+    return false;
   }
+  emailFrInput.classList.remove('is-invalid');
+  return true;
+}
+
+forms.forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertArea.innerHTML = '';
+
+      const isEnglish = form.id === 'download-form-en';
+      const valid = isEnglish ? validateEnglishForm() : validateFrenchForm();
+
+      if (!valid) return;
+
+      setLoading(true);
+
+      try {
+        form.elements.locale.value = currentLang;
+
+        form.submit();
+        showAlert('success', t('alert.success'));
+        form.reset();
+        [fullNameInput, emailInput, emailFrInput].forEach(input =>
+          input?.classList.remove('is-invalid')
+        );
+      } catch (err) {
+        showAlert('danger', t('alert.error'));
+      } finally {
+        setLoading(false);
+      }
+    });
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────────
