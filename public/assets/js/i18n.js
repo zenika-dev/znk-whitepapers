@@ -30,6 +30,18 @@ function applyTranslations() {
   document.documentElement.lang = currentLang;
 }
 
+function updateBrevoForm(lang) {
+    document.getElementById("english-form").hidden = lang !== "en";
+    document.getElementById("french-form").hidden = lang !== "fr";
+
+    document.getElementById("submit-btn").setAttribute(
+        "form",
+        lang === "fr"
+            ? "download-form-fr"
+            : "download-form-en"
+    );
+}
+
 function setLanguage(lang) {
   currentLang = lang;
   const url = new URL(window.location);
@@ -37,6 +49,7 @@ function setLanguage(lang) {
   history.replaceState(null, '', url);
   applyTranslations();
   document.dispatchEvent(new CustomEvent('langchange', { detail: { lang } }));
+  updateBrevoForm(lang);
 }
 
 (function () {
@@ -50,4 +63,6 @@ function setLanguage(lang) {
   history.replaceState(null, '', url);
 })();
 
-document.addEventListener('DOMContentLoaded', applyTranslations);
+document.addEventListener('DOMContentLoaded', function () {
+    setLanguage(currentLang);
+});
