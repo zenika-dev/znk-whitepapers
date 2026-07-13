@@ -241,41 +241,24 @@ function validateEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function validateEnglishForm() {
-  let valid = true;
-
-  const nameEmpty = !fullNameInput.value.trim();
-  if (nameEmpty) {
-    fullNameInput.classList.add('is-invalid');
-    valid = false;
-  } else {
-    fullNameInput.classList.remove('is-invalid');
-  }
-
-  const emailValue = emailInput.value;
-  const emailEmpty = !emailValue.trim();
-  const emailBad = !emailEmpty && !validateEmail(emailValue);
-  if (emailEmpty || emailBad) {
-    emailInput.classList.add('is-invalid');
-    valid = false;
-  } else {
-    emailInput.classList.remove('is-invalid');
-  }
-
-  return valid;
+function setFieldValidity(input, isValid) {
+  input.classList.toggle('is-invalid', !isValid);
+  return isValid;
 }
 
-function validateFrenchForm() {
-  const emailValue = emailFrInput.value;
-  const emailEmpty = !emailValue.trim();
-  const emailBad = !emailEmpty && !validateEmail(emailValue);
+// English form validates name + email; French validates email only.
+// validateEmail() already rejects empty/whitespace-only values, so a single
+// check covers both the "required" and "well-formed" cases.
+function validateForm(lang) {
+  const isEnglish = lang === 'en';
+  const emailField = isEnglish ? emailInput : emailFrInput;
 
-  if (emailEmpty || emailBad) {
-    emailFrInput.classList.add('is-invalid');
-    return false;
-  }
-  emailFrInput.classList.remove('is-invalid');
-  return true;
+  const emailValid = setFieldValidity(emailField, validateEmail(emailField.value));
+  const nameValid = isEnglish
+    ? setFieldValidity(fullNameInput, !!fullNameInput.value.trim())
+    : true;
+
+  return emailValid && nameValid;
 }
 
 forms.forEach(form => {
@@ -283,10 +266,8 @@ forms.forEach(form => {
       e.preventDefault();
       alertArea.innerHTML = '';
 
-      const isEnglish = form.id === 'download-form-en';
-      const valid = isEnglish ? validateEnglishForm() : validateFrenchForm();
-
-      if (!valid) return;
+      const lang = form.id === 'download-form-en' ? 'en' : 'fr';
+      if (!validateForm(lang)) return;
 
       setLoading(true);
 
